@@ -29,15 +29,15 @@ export class DrugModel {
 
     if (query) {
       let _query = `%${query}%`
-      sql.where((w: any) => {
-        w.where('name', 'like', _query)
+      sql.where((builder) => {
+        builder.where('name', 'like', _query)
           .orWhere('code', 'like', _query)
       })
     }
 
     return sql
       .where({ hospcode })
-      .count('* as total')
+      .count({ total: '*' })
 
   }
 
