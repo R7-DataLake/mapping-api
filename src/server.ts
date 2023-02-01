@@ -14,7 +14,7 @@ const start = async () => {
       }
     }
 
-    const port = process.env.R7PLATFORM_LOGIN_PORT ? Number(process.env.R7PLATFORM_LOGIN_PORT) : 3000
+    const port = process.env.R7PLATFORM_MAPPING_API_PORT ? Number(process.env.R7PLATFORM_MAPPING_API_PORT) : 3000
 
     app.listen({ port }, (err, address) => {
       if (err) {
