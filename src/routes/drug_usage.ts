@@ -3,25 +3,24 @@ import {
   StatusCodes,
   getReasonPhrase,
 } from 'http-status-codes'
-import { IDrugInsert, IDrugMapping, IDrugUpdate } from "../../@types/drug"
-import { DrugModel } from "../models/drug"
+import { IDrugUsageInsert, IDrugUsageUpdate } from "../../@types/drug_usage"
+import { DrugUsageModel } from "../models/drug_usage"
 
 const fs = require('fs')
 const csv = require('csv-parser')
 
 const { DateTime } = require('luxon')
 
-import mappingSchema from '../schema/drug/mapping'
-import deleteSchema from '../schema/drug/delete'
-import updateSchema from '../schema/drug/update'
+import deleteSchema from '../schema/drug_usage/delete'
+import updateSchema from '../schema/drug_usage/update'
 
 
 export default async (fastify: FastifyInstance) => {
 
   const db = fastify.db
-  const drugModel = new DrugModel()
+  const drugUsageModel = new DrugUsageModel()
 
-  fastify.post('/drugs/upload', {
+  fastify.post('/drug-usages/upload', {
     onRequest: [fastify.authenticate],
     config: {
       rateLimit: {
@@ -47,12 +46,12 @@ export default async (fastify: FastifyInstance) => {
       }
 
       const filepath = files[0].filepath
-      let results: IDrugInsert[] = [];
+      let results: IDrugUsageInsert[] = [];
 
       const stream = fs.createReadStream(filepath)
         .pipe(csv())
 
-      const expectedHeader = ['code', 'name']
+      const expectedHeader = ['code', 'usage1', 'usage2', 'usage3']
       let headerChecked = false
 
       for await (const data of stream) {
@@ -71,9 +70,12 @@ export default async (fastify: FastifyInstance) => {
           }
           headerChecked = true
         }
+
         results.push({
           hospcode,
-          name: data.name,
+          usage1: data.usage1,
+          usage2: data.usage2,
+          usage3: data.usage3,
           code: data.code,
           user_id: userId,
           updated_at: now,
@@ -81,7 +83,7 @@ export default async (fastify: FastifyInstance) => {
       }
 
       // Import
-      await drugModel.bulkInsert(db, results)
+      await drugUsageModel.bulkInsert(db, results)
 
       reply.status(StatusCodes.OK)
         .send(getReasonPhrase(StatusCodes.OK))
@@ -98,7 +100,7 @@ export default async (fastify: FastifyInstance) => {
   })
 
   // Remove drug
-  fastify.delete('/drugs/:code/delete', {
+  fastify.delete('/drug-usages/:code/delete', {
     onRequest: [fastify.authenticate],
     schema: deleteSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
@@ -108,39 +110,7 @@ export default async (fastify: FastifyInstance) => {
 
       const params: any = request.params
       const { code } = params
-      await drugModel.remove(db, code, hospcode)
-      reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
-    } catch (error: any) {
-      request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
-    }
-  })
-
-  // Save mapping
-  fastify.post('/drugs/mapping', {
-    onRequest: [fastify.authenticate],
-    schema: mappingSchema,
-  }, async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const hospcode = request.user.hospcode
-      const userId = request.user.sub
-
-      const body: any = request.body
-      const { code, f43, nhso, tmt } = body
-
-      const now = DateTime.now().setZone('Asia/Bangkok');
-
-      const data: IDrugMapping = {
-        code,
-        f43,
-        nhso,
-        tmt,
-        user_id: userId,
-        hospcode,
-        updated_at: now
-      }
-
-      await drugModel.mapping(db, data)
+      await drugUsageModel.remove(db, code, hospcode)
       reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
     } catch (error: any) {
       request.log.error(error)
@@ -149,7 +119,7 @@ export default async (fastify: FastifyInstance) => {
   })
 
   // Update info
-  fastify.put('/drugs/:code/update', {
+  fastify.put('/drug-usages/:code/update', {
     onRequest: [fastify.authenticate],
     schema: updateSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
@@ -161,17 +131,19 @@ export default async (fastify: FastifyInstance) => {
       const { code } = params
 
       const body: any = request.body
-      const { name } = body
+      const { usage1, usage2, usage3 } = body
 
       const now = DateTime.now().setZone('Asia/Bangkok');
 
-      const data: IDrugUpdate = {
-        name,
+      const data: IDrugUsageUpdate = {
+        usage1,
+        usage2,
+        usage3,
         user_id: userId,
         updated_at: now
       }
 
-      await drugModel.update(db, hospcode, code, data)
+      await drugUsageModel.update(db, hospcode, code, data)
       reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
     } catch (error: any) {
       request.log.error(error)

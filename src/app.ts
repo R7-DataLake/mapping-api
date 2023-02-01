@@ -1,7 +1,6 @@
 import fastify from 'fastify'
 import path from 'path'
 const autoload = require('@fastify/autoload')
-const crypto = require('crypto')
 
 const app = fastify({
   logger: {
@@ -31,6 +30,15 @@ app.register(import('@fastify/rate-limit'), {
   timeWindow: '1 minute'
 })
 
+// Web services
+app.register(require('fastify-axios'), {
+  clients: {
+    loginService: {
+      baseURL: process.env.R7PLATFORM_MAPPING_API_LOGIN_ENDPOINT || 'http://localhost:3001'
+    }
+  }
+})
+
 // Database
 app.register(require('./plugins/db'), {
   options: {
@@ -55,8 +63,8 @@ app.register(require('./plugins/db'), {
 app.register(require('./plugins/jwt'), {
   secret: process.env.R7PLATFORM_MAPPING_API_SECRET_KEY || '@1234567890@',
   sign: {
-    iss: 'r7.moph.go.th',
-    expiresIn: '10m'
+    iss: 'r7platform-mapping.moph.go.th',
+    expiresIn: '1d'
   },
   messages: {
     badRequestErrorMessage: 'Format is Authorization: Bearer [token]',
@@ -68,14 +76,6 @@ app.register(require('./plugins/jwt'), {
   }
 })
 
-// hash password
-app.decorate('hashPassword', async (password: any) => {
-  const salt = process.env.R7PLATFORM_MAPPING_API_PASSWORD_SALT || 'gwuqpUkUm3jv07Ui0TCqZoZBuaJLztD9'
-  return await crypto
-    .createHash('md5')
-    .update(password + salt)
-    .digest('hex')
-})
 // routes
 app.register(autoload, {
   dir: path.join(__dirname, 'routes')
