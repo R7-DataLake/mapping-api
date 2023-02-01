@@ -4,6 +4,43 @@ export class LabModel {
 
   constructor () { }
 
+  list(db: Knex, hospcode: any, query: any, limit: any, offset: any) {
+
+    let sql = db('labs')
+      .select('code', 'name', 'lab_group_code', 'created_at', 'updated_at')
+
+    if (query) {
+      let _query = `%${query}%`
+      sql.where(builder => {
+        builder.where('name', 'like', _query)
+          .orWhere('code', 'like', _query)
+      })
+    }
+
+    return sql
+      .where({ hospcode })
+      .limit(limit).offset(offset)
+
+  }
+
+  listTotal(db: Knex, hospcode: any, query: any) {
+
+    let sql = db('labs')
+
+    if (query) {
+      let _query = `%${query}%`
+      sql.where(builder => {
+        builder.where('name', 'like', _query)
+          .orWhere('code', 'like', _query)
+      })
+    }
+
+    return sql
+      .where({ hospcode })
+      .count({ total: '*' })
+
+  }
+
   bulkInsert(db: Knex, data: ILabInsert[]) {
     return db('labs')
       .insert(data)
