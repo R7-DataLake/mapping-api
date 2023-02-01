@@ -10,9 +10,11 @@ export interface IDrugInsert {
   hospcode: string
   name: string
   user_id: string
+  updated_at: string
 }
 
 export interface IDrugUpdate {
   name: string
   user_id: string
+  updated_at: string
 }

@@ -1,6 +1,6 @@
 import { Knex } from 'knex'
 import { IDrugInsert, IDrugMapping, IDrugUpdate } from '../../@types/mapping'
-export class LoginModel {
+export class DrugModel {
 
   constructor () { }
 
@@ -8,14 +8,14 @@ export class LoginModel {
     return db('drugs')
       .insert(data)
       .onConflict(['code', 'hospcode'])
-      .merge()
+      .merge(['name', 'user_id', 'updated_at'])
   }
 
   save(db: Knex, data: IDrugInsert) {
     return db('drugs')
       .insert(data)
       .onConflict(['code', 'hospcode'])
-      .merge()
+      .merge(['name', 'user_id', 'updated_at'])
   }
 
   update(db: Knex, hospcode: any, code: any, data: IDrugUpdate) {
