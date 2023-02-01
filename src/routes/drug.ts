@@ -36,6 +36,15 @@ export default async (fastify: FastifyInstance) => {
 
       const files = await request.saveRequestFiles({ limits: { fileSize: 17000 } })
 
+      for (const file of files) {
+        if (file.mimetype !== 'text/csv') {
+          return reply.status(StatusCodes.BAD_REQUEST)
+            .send({ error: 'Invalid file type' });
+        }
+      }
+
+      // check file 
+
       const filepath = files[0].filepath
       // console.log(filepath)
       // files[0].fieldname
