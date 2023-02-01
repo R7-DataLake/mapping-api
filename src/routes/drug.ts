@@ -21,6 +21,24 @@ export default async (fastify: FastifyInstance) => {
   const db = fastify.db
   const drugModel = new DrugModel()
 
+  fastify.get('/drugs/list', {
+    onRequest: [fastify.authenticate]
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const _query: any = request.query
+      const { limit, offset, query } = _query
+      const _limit = limit || 20
+      const _offset = offset || 0
+
+      const hospcode = request.user.hospcode
+
+      const results: any = await drugModel.list(db, hospcode, query, _limit, _offset)
+      reply.status(StatusCodes.OK).send(results)
+    } catch (e) {
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+    }
+  })
+
   fastify.post('/drugs/upload', {
     onRequest: [fastify.authenticate],
     config: {

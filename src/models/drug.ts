@@ -4,6 +4,24 @@ export class DrugModel {
 
   constructor () { }
 
+  list(db: Knex, hospcode: any, query: any, limit: any, offset: any) {
+
+    let sql: any = db('drugs')
+
+    if (query) {
+      let _query = `%${query}%`
+      sql.where((w: any) => {
+        w.where('name', 'like', _query)
+          .orWhere('code', 'like', _query)
+      })
+    }
+
+    return sql
+      .where({ hospcode })
+      .limit(limit).offset(offset)
+
+  }
+
   bulkInsert(db: Knex, data: IDrugInsert[]) {
     return db('drugs')
       .insert(data)
