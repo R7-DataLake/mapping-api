@@ -47,14 +47,16 @@ export default async (fastify: FastifyInstance) => {
         results.push(data)
       }
 
-      if (headerChecked)
+      if (headerChecked) {
 
-        reply
-          .status(StatusCodes.UNAUTHORIZED)
-          .send({
-            code: StatusCodes.UNAUTHORIZED,
-            error: getReasonPhrase(StatusCodes.UNAUTHORIZED)
-          })
+      }
+
+      reply
+        .status(StatusCodes.UNAUTHORIZED)
+        .send({
+          code: StatusCodes.UNAUTHORIZED,
+          error: getReasonPhrase(StatusCodes.UNAUTHORIZED)
+        })
     } catch (error: any) {
       request.log.error(error)
       reply
