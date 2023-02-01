@@ -22,6 +22,32 @@ export default async (fastify: FastifyInstance) => {
   const db = fastify.db
   const labModel = new LabModel()
 
+
+  fastify.get('/labs/list', {
+    onRequest: [fastify.authenticate]
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const _query: any = request.query
+      const { limit, offset, query } = _query
+      const _limit = limit || 20
+      const _offset = offset || 0
+
+      const hospcode = request.user.hospcode
+
+      const results: any = await labModel.list(db, hospcode, query, _limit, _offset)
+
+      const rsTotal: any = await labModel.listTotal(db, hospcode, query)
+
+      reply.status(StatusCodes.OK).send({
+        results,
+        'total': Number(rsTotal[0].total)
+      })
+    } catch (error: any) {
+      request.log.error(error)
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+    }
+  })
+
   fastify.post('/labs/upload', {
     onRequest: [fastify.authenticate],
     config: {
