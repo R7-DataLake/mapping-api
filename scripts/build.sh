@@ -1,1 +1,1 @@
-docker build -t r7platform/login . --no-cache
+docker build -t r7platform/mapping-api . --no-cache

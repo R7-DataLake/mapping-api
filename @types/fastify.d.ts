@@ -7,12 +7,13 @@ declare module 'fastify' {
     jwt: jsonwebtoken
     authenticate: any
     db: Knex
-    hashPassword: any
   }
 
   interface FastifyRequest {
     jwtVerify: any
     user: any
+    file(): any
+    saveRequestFiles(options: any): any
   }
 
 }

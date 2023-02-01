@@ -3,7 +3,6 @@ import path from 'path'
 const autoload = require('@fastify/autoload')
 const crypto = require('crypto')
 
-
 const app = fastify({
   logger: {
     transport:
@@ -23,6 +22,7 @@ const app = fastify({
 // Plugins
 app.register(require('@fastify/formbody'))
 app.register(require('@fastify/cors'))
+app.register(require('@fastify/multipart'))
 
 // Rate limit
 app.register(import('@fastify/rate-limit'), {
