@@ -34,7 +34,7 @@ export class DrugModel {
     return db('drug_mappings')
       .insert(data)
       .onConflict(['code', 'hospcode'])
-      .merge()
+      .merge(['f43', 'tmt', 'nhso', 'updated_at'])
   }
 
 }

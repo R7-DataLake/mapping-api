@@ -1,15 +1,17 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify"
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import {
   StatusCodes,
   getReasonPhrase,
 } from 'http-status-codes'
-import { IDrugInsert } from "../../@types/mapping"
+import { IDrugInsert, IDrugMapping } from "../../@types/mapping"
 import { DrugModel } from "../models/drug"
 
 const fs = require('fs')
 const csv = require('csv-parser')
 
-const { DateTime, Settings } = require('luxon');
+const { DateTime, Settings } = require('luxon')
+
+import mappingSchema from '../schema/mapping'
 
 
 export default async (fastify: FastifyInstance) => {
@@ -31,8 +33,7 @@ export default async (fastify: FastifyInstance) => {
       const userId: any = request.user.sub
       const hospcode: any = request.user.hospcode
 
-      Settings.defaultZone = "Asia/Bangkok";
-      const now = DateTime.now();
+      const now = DateTime.now().setZone('Asia/Bangkok');
 
       const files = await request.saveRequestFiles({ limits: { fileSize: 17000 } })
 
@@ -91,6 +92,38 @@ export default async (fastify: FastifyInstance) => {
           code: StatusCodes.INTERNAL_SERVER_ERROR,
           error: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
         })
+    }
+  })
+
+  // Save mapping
+  fastify.post('/drugs/mapping', {
+    onRequest: [fastify.authenticate],
+    schema: mappingSchema,
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const hospcode = request.user.hospcode
+      const userId = request.user.sub
+
+      const body: any = request.body
+      const { code, f43, nhso, tmt } = body
+
+      const now = DateTime.now().setZone('Asia/Bangkok');
+
+      const data: IDrugMapping = {
+        code,
+        f43,
+        nhso,
+        tmt,
+        user_id: userId,
+        hospcode,
+        updated_at: now
+      }
+
+      await drugModel.mapping(db, data)
+      reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
+    } catch (error: any) {
+      request.log.error(error)
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
     }
   })
 
