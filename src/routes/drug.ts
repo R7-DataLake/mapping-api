@@ -3,15 +3,17 @@ import {
   StatusCodes,
   getReasonPhrase,
 } from 'http-status-codes'
-import { IDrugInsert, IDrugMapping } from "../../@types/drug"
+import { IDrugInsert, IDrugMapping, IDrugUpdate } from "../../@types/drug"
 import { DrugModel } from "../models/drug"
 
 const fs = require('fs')
 const csv = require('csv-parser')
 
-const { DateTime, Settings } = require('luxon')
+const { DateTime } = require('luxon')
 
-import mappingSchema from '../schema/drug_mapping'
+import mappingSchema from '../schema/drug/mapping'
+import deleteSchema from '../schema/drug/delete'
+import updateSchema from '../schema/drug/update'
 
 
 export default async (fastify: FastifyInstance) => {
@@ -95,6 +97,25 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
+  // Remove drug
+  fastify.delete('/drugs/:code/delete', {
+    onRequest: [fastify.authenticate],
+    schema: deleteSchema,
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const hospcode = request.user.hospcode
+      // const userId = request.user.sub
+
+      const params: any = request.params
+      const { code } = params
+      await drugModel.remove(db, code, hospcode)
+      reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
+    } catch (error: any) {
+      request.log.error(error)
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+    }
+  })
+
   // Save mapping
   fastify.post('/drugs/mapping', {
     onRequest: [fastify.authenticate],
@@ -120,6 +141,37 @@ export default async (fastify: FastifyInstance) => {
       }
 
       await drugModel.mapping(db, data)
+      reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
+    } catch (error: any) {
+      request.log.error(error)
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+    }
+  })
+
+  // Update info
+  fastify.put('/drugs/:code/update', {
+    onRequest: [fastify.authenticate],
+    schema: updateSchema,
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const hospcode = request.user.hospcode
+      const userId = request.user.sub
+
+      const params: any = request.params
+      const { code } = params
+
+      const body: any = request.body
+      const { name } = body
+
+      const now = DateTime.now().setZone('Asia/Bangkok');
+
+      const data: IDrugUpdate = {
+        name,
+        user_id: userId,
+        updated_at: now
+      }
+
+      await drugModel.update(db, hospcode, code, data)
       reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
     } catch (error: any) {
       request.log.error(error)
