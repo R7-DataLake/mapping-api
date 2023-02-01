@@ -1,5 +1,5 @@
 import { Knex } from 'knex'
-import { IDrugInsert, IDrugMapping, IDrugUpdate } from '../../@types/mapping'
+import { IDrugInsert, IDrugMapping, IDrugUpdate } from '../../@types/drug'
 export class DrugModel {
 
   constructor () { }

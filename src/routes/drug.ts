@@ -3,7 +3,7 @@ import {
   StatusCodes,
   getReasonPhrase,
 } from 'http-status-codes'
-import { IDrugInsert, IDrugMapping } from "../../@types/mapping"
+import { IDrugInsert, IDrugMapping } from "../../@types/drug"
 import { DrugModel } from "../models/drug"
 
 const fs = require('fs')
@@ -11,7 +11,7 @@ const csv = require('csv-parser')
 
 const { DateTime, Settings } = require('luxon')
 
-import mappingSchema from '../schema/mapping'
+import mappingSchema from '../schema/drug_mapping'
 
 
 export default async (fastify: FastifyInstance) => {
