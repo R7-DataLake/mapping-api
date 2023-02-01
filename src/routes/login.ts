@@ -3,7 +3,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify"
 import { getReasonPhrase, StatusCodes } from "http-status-codes"
 
 import { LoginService } from '../models/login'
-import * as _ from 'lodash'
+import _ from 'lodash'
 
 export default async (fastify: FastifyInstance) => {
 
