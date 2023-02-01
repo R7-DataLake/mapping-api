@@ -33,8 +33,15 @@ export default async (fastify: FastifyInstance) => {
       const hospcode = request.user.hospcode
 
       const results: any = await drugModel.list(db, hospcode, query, _limit, _offset)
-      reply.status(StatusCodes.OK).send(results)
-    } catch (e) {
+
+      const total = await drugModel.listTotal(db, hospcode, query)
+
+      reply.status(StatusCodes.OK).send({
+        results,
+        'total': Number(total[0].total)
+      })
+    } catch (error: any) {
+      request.log.error(error)
       reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
     }
   })

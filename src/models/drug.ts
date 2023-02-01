@@ -7,6 +7,7 @@ export class DrugModel {
   list(db: Knex, hospcode: any, query: any, limit: any, offset: any) {
 
     let sql: any = db('drugs')
+      .select('code', 'name', 'created_at', 'updated_at')
 
     if (query) {
       let _query = `%${query}%`
@@ -19,6 +20,24 @@ export class DrugModel {
     return sql
       .where({ hospcode })
       .limit(limit).offset(offset)
+
+  }
+
+  listTotal(db: Knex, hospcode: any, query: any) {
+
+    let sql = db('drugs')
+
+    if (query) {
+      let _query = `%${query}%`
+      sql.where((w: any) => {
+        w.where('name', 'like', _query)
+          .orWhere('code', 'like', _query)
+      })
+    }
+
+    return sql
+      .where({ hospcode })
+      .count('* as total')
 
   }
 
