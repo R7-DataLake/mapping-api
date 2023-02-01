@@ -43,16 +43,7 @@ export default async (fastify: FastifyInstance) => {
         }
       }
 
-      // check file 
-
       const filepath = files[0].filepath
-      // console.log(filepath)
-      // files[0].fieldname
-      // files[0].filename
-      // files[0].encoding
-      // files[0].mimetype
-      // files[0].fields
-
       let results: IDrugInsert[] = [];
 
       const stream = fs.createReadStream(filepath)
@@ -65,12 +56,14 @@ export default async (fastify: FastifyInstance) => {
         if (!headerChecked) {
           const header = Object.keys(data);
           if (!expectedHeader.every((h) => header.includes(h))) {
-            console.error(`ERROR: The header of the CSV file is invalid. Expected: ${expectedHeader.join(', ')}. Found: ${header.join(', ')}.`)
+            const errorMessage = `ERROR: The header of the CSV file is invalid. Expected: ${expectedHeader.join(', ')}. Found: ${header.join(', ')}.`
+            console.error(errorMessage)
+
             return reply
               .status(StatusCodes.INTERNAL_SERVER_ERROR)
               .send({
                 code: StatusCodes.INTERNAL_SERVER_ERROR,
-                error: 'The header of the CSV file is invalid.'
+                error: errorMessage
               })
           }
           headerChecked = true
