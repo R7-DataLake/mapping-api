@@ -29,7 +29,7 @@ export class LabModel {
 
     if (query) {
       let _query = `%${query}%`
-      sql.where((builder) => {
+      sql.where(builder => {
         builder.where('name', 'like', _query)
           .orWhere('code', 'like', _query)
       })

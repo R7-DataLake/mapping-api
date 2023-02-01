@@ -6,13 +6,13 @@ export class DrugModel {
 
   list(db: Knex, hospcode: any, query: any, limit: any, offset: any) {
 
-    let sql: any = db('drugs')
+    let sql = db('drugs')
       .select('code', 'name', 'created_at', 'updated_at')
 
     if (query) {
       let _query = `%${query}%`
-      sql.where((w: any) => {
-        w.where('name', 'like', _query)
+      sql.where(builder => {
+        builder.where('name', 'like', _query)
           .orWhere('code', 'like', _query)
       })
     }
@@ -29,7 +29,7 @@ export class DrugModel {
 
     if (query) {
       let _query = `%${query}%`
-      sql.where((builder) => {
+      sql.where(builder => {
         builder.where('name', 'like', _query)
           .orWhere('code', 'like', _query)
       })
