@@ -36,7 +36,11 @@ export default async (fastify: FastifyInstance) => {
 
       const now = DateTime.now().setZone('Asia/Bangkok');
 
-      const files = await request.saveRequestFiles({ limits: { fileSize: 17000 } })
+      const files = await request.saveRequestFiles({
+        limits: {
+          fileSize: 10 * 1024 * 1024 // 10mb
+        }
+      })
 
       for (const file of files) {
         if (file.mimetype !== 'text/csv') {
