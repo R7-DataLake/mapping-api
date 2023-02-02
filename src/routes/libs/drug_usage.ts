@@ -21,7 +21,6 @@ export default async (fastify: FastifyInstance) => {
   const drugUsageModel = new DrugUsageModel()
 
   fastify.post('/upload', {
-    onRequest: [fastify.authenticate],
     config: {
       rateLimit: {
         max: 10,
@@ -105,7 +104,6 @@ export default async (fastify: FastifyInstance) => {
 
   // Remove drug
   fastify.delete('/:code/delete', {
-    onRequest: [fastify.authenticate],
     schema: deleteSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -124,7 +122,6 @@ export default async (fastify: FastifyInstance) => {
 
   // Update info
   fastify.put('/:code/update', {
-    onRequest: [fastify.authenticate],
     schema: updateSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
