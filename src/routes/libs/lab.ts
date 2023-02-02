@@ -17,7 +17,7 @@ import updateSchema from '../../schema/lab/update'
 import { ILabInsert, ILabMapping, ILabUpdate } from '../../../@types/lab'
 
 
-export default async (fastify: FastifyInstance, options: any, next: any) => {
+export default async (fastify: FastifyInstance, options: any, done: any) => {
 
   const db = fastify.db
   const labModel = new LabModel()
@@ -205,6 +205,6 @@ export default async (fastify: FastifyInstance, options: any, next: any) => {
     }
   })
 
-  next()
+  done()
 
 } 

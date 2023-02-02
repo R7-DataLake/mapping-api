@@ -5,7 +5,7 @@ import { getReasonPhrase, StatusCodes } from "http-status-codes"
 import { LoginService } from '../models/login'
 import _ from 'lodash'
 
-export default async (fastify: FastifyInstance) => {
+export default async (fastify: FastifyInstance, _: any, done: any) => {
 
   const loginService = new LoginService()
 
@@ -47,5 +47,7 @@ export default async (fastify: FastifyInstance) => {
       reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
     }
   })
+
+  done()
 
 } 
