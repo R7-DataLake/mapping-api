@@ -16,10 +16,10 @@ const start = async () => {
 
     const port = process.env.R7PLATFORM_MAPPING_API_PORT ? Number(process.env.R7PLATFORM_MAPPING_API_PORT) : 3000
 
-    app.listen({ port }, (err, address) => {
+    app.listen({ port, host: '0.0.0.0' }, (err, address) => {
       if (err) {
-        console.error(err);
-        process.exit(1);
+        console.error(err)
+        process.exit(1)
       }
     })
 
