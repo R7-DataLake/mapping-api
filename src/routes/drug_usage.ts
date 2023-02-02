@@ -34,7 +34,7 @@ export default async (fastify: FastifyInstance) => {
       const userId: any = request.user.sub
       const hospcode: any = request.user.hospcode
 
-      const now = DateTime.now().setZone('Asia/Bangkok');
+      const now = DateTime.now().setZone('Asia/Bangkok')
 
       const files = await request.saveRequestFiles({
         limits: {
@@ -45,12 +45,12 @@ export default async (fastify: FastifyInstance) => {
       for (const file of files) {
         if (file.mimetype !== 'text/csv') {
           return reply.status(StatusCodes.BAD_REQUEST)
-            .send({ error: 'Invalid file type' });
+            .send({ error: 'Invalid file type' })
         }
       }
 
       const filepath = files[0].filepath
-      let results: IDrugUsageInsert[] = [];
+      let results: IDrugUsageInsert[] = []
 
       const stream = fs.createReadStream(filepath)
         .pipe(csv())
