@@ -21,7 +21,7 @@ export default async (fastify: FastifyInstance) => {
   const db = fastify.db
   const drugModel = new DrugModel()
 
-  fastify.get('/libs/drugs/list', {
+  fastify.get('/list', {
     onRequest: [fastify.authenticate]
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -46,7 +46,7 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
-  fastify.post('/libs/drugs/upload', {
+  fastify.post('/upload', {
     onRequest: [fastify.authenticate],
     config: {
       rateLimit: {
@@ -127,7 +127,7 @@ export default async (fastify: FastifyInstance) => {
   })
 
   // Remove drug
-  fastify.delete('/libs/drugs/:code/delete', {
+  fastify.delete('/:code/delete', {
     onRequest: [fastify.authenticate],
     schema: deleteSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
@@ -146,7 +146,7 @@ export default async (fastify: FastifyInstance) => {
   })
 
   // Save mapping
-  fastify.post('/libs/drugs/mapping', {
+  fastify.post('/mapping', {
     onRequest: [fastify.authenticate],
     schema: mappingSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
@@ -178,7 +178,7 @@ export default async (fastify: FastifyInstance) => {
   })
 
   // Update info
-  fastify.put('/libs/drugs/:code/update', {
+  fastify.put('/:code/update', {
     onRequest: [fastify.authenticate],
     schema: updateSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
