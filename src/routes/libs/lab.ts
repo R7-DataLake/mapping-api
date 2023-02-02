@@ -22,10 +22,7 @@ export default async (fastify: FastifyInstance, options: any, next: any) => {
   const db = fastify.db
   const labModel = new LabModel()
 
-
-  fastify.get('/list', {
-    onRequest: [fastify.authenticate]
-  }, async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/list', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const _query: any = request.query
       const { limit, offset, query } = _query
@@ -49,7 +46,6 @@ export default async (fastify: FastifyInstance, options: any, next: any) => {
   })
 
   fastify.post('/upload', {
-    onRequest: [fastify.authenticate],
     config: {
       rateLimit: {
         max: 10,
@@ -131,7 +127,6 @@ export default async (fastify: FastifyInstance, options: any, next: any) => {
 
   // Remove drug
   fastify.delete('/:code/delete', {
-    onRequest: [fastify.authenticate],
     schema: deleteSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -150,7 +145,6 @@ export default async (fastify: FastifyInstance, options: any, next: any) => {
 
   // Save mapping
   fastify.post('/mapping', {
-    onRequest: [fastify.authenticate],
     schema: mappingSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -182,7 +176,6 @@ export default async (fastify: FastifyInstance, options: any, next: any) => {
 
   // Update info
   fastify.put('/:code/update', {
-    onRequest: [fastify.authenticate],
     schema: updateSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
