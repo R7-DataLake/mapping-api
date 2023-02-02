@@ -21,7 +21,7 @@ export default async (fastify: FastifyInstance) => {
   const db = fastify.db
   const drugModel = new DrugModel()
 
-  fastify.get('/drugs/list', {
+  fastify.get('/list', {
     onRequest: [fastify.authenticate]
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -46,7 +46,7 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
-  fastify.post('/drugs/upload', {
+  fastify.post('/upload', {
     onRequest: [fastify.authenticate],
     config: {
       rateLimit: {
@@ -86,7 +86,7 @@ export default async (fastify: FastifyInstance) => {
 
       for await (const data of stream) {
         if (!headerChecked) {
-          const header = Object.keys(data);
+          const header = Object.keys(data)
           if (!expectedHeader.every((h) => header.includes(h))) {
             const errorMessage = `ERROR: The header of the CSV file is invalid. Expected: ${expectedHeader.join(', ')}. Found: ${header.join(', ')}.`
             console.error(errorMessage)
@@ -127,7 +127,7 @@ export default async (fastify: FastifyInstance) => {
   })
 
   // Remove drug
-  fastify.delete('/drugs/:code/delete', {
+  fastify.delete('/:code/delete', {
     onRequest: [fastify.authenticate],
     schema: deleteSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
@@ -146,7 +146,7 @@ export default async (fastify: FastifyInstance) => {
   })
 
   // Save mapping
-  fastify.post('/drugs/mapping', {
+  fastify.post('/mapping', {
     onRequest: [fastify.authenticate],
     schema: mappingSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
@@ -178,7 +178,7 @@ export default async (fastify: FastifyInstance) => {
   })
 
   // Update info
-  fastify.put('/drugs/:code/update', {
+  fastify.put('/:code/update', {
     onRequest: [fastify.authenticate],
     schema: updateSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {

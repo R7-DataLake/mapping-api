@@ -17,13 +17,13 @@ import updateSchema from '../../schema/lab/update'
 import { ILabInsert, ILabMapping, ILabUpdate } from '../../../@types/lab'
 
 
-export default async (fastify: FastifyInstance) => {
+export default async (fastify: FastifyInstance, options: any, next: any) => {
 
   const db = fastify.db
   const labModel = new LabModel()
 
 
-  fastify.get('/labs/list', {
+  fastify.get('/list', {
     onRequest: [fastify.authenticate]
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
@@ -48,7 +48,7 @@ export default async (fastify: FastifyInstance) => {
     }
   })
 
-  fastify.post('/labs/upload', {
+  fastify.post('/upload', {
     onRequest: [fastify.authenticate],
     config: {
       rateLimit: {
@@ -130,7 +130,7 @@ export default async (fastify: FastifyInstance) => {
   })
 
   // Remove drug
-  fastify.delete('/labs/:code/delete', {
+  fastify.delete('/:code/delete', {
     onRequest: [fastify.authenticate],
     schema: deleteSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
@@ -149,7 +149,7 @@ export default async (fastify: FastifyInstance) => {
   })
 
   // Save mapping
-  fastify.post('/labs/mapping', {
+  fastify.post('/mapping', {
     onRequest: [fastify.authenticate],
     schema: mappingSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
@@ -181,7 +181,7 @@ export default async (fastify: FastifyInstance) => {
   })
 
   // Update info
-  fastify.put('/labs/:code/update', {
+  fastify.put('/:code/update', {
     onRequest: [fastify.authenticate],
     schema: updateSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
@@ -211,5 +211,7 @@ export default async (fastify: FastifyInstance) => {
       reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
     }
   })
+
+  next()
 
 } 

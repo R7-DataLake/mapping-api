@@ -1,1 +1,1 @@
-docker build -t r7platform/mapping-api . --no-cache
+docker build -t mophos/r7platform-userportal-api . --no-cache
