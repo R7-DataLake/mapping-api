@@ -41,7 +41,7 @@ app.register(
 app.register(require('fastify-axios'), {
   clients: {
     loginService: {
-      baseURL: process.env.R7PLATFORM_MAPPING_API_LOGIN_ENDPOINT || 'http://localhost:3001'
+      baseURL: process.env.R7PLATFORM_MAPPING_API_LOGIN_ENDPOINT || 'http://127.0.0.1:3001'
     }
   }
 })
