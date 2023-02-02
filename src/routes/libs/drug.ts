@@ -16,7 +16,7 @@ import deleteSchema from '../../schema/drug/delete'
 import updateSchema from '../../schema/drug/update'
 
 
-export default async (fastify: FastifyInstance) => {
+export default async (fastify: FastifyInstance, _: any, done: any) => {
 
   const db = fastify.db
   const drugModel = new DrugModel()
@@ -201,5 +201,7 @@ export default async (fastify: FastifyInstance) => {
       reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
     }
   })
+
+  done()
 
 } 
