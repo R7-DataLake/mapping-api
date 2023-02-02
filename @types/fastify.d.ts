@@ -1,6 +1,6 @@
-import * as jsonwebtoken from 'jsonwebtoken';
-import { AxiosInstance } from 'axios';
-import Knex from 'knex';
+import * as jsonwebtoken from 'jsonwebtoken'
+import { AxiosInstance } from 'axios'
+import Knex from 'knex'
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -14,7 +14,7 @@ declare module 'fastify' {
     jwtVerify: any
     user: any
     file(): any
-    saveRequestFiles(options: any): any
+    saveRequestFiles(options: any): Promise<any[]>
   }
 
 }
