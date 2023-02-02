@@ -5,7 +5,7 @@ import { getReasonPhrase, StatusCodes } from "http-status-codes"
 import { LoginService } from '../models/login'
 import _ from 'lodash'
 
-export default async (fastify: FastifyInstance, _: any, done: any) => {
+export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
   const loginService = new LoginService()
 
@@ -43,8 +43,7 @@ export default async (fastify: FastifyInstance, _: any, done: any) => {
           .send(getReasonPhrase(StatusCodes.UNAUTHORIZED))
       }
     } catch (error: any) {
-      request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+      reply.status(StatusCodes.BAD_GATEWAY).send(error)
     }
   })
 

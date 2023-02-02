@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify"
 
-export default async (fastify: FastifyInstance, _: any, done: any) => {
+export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
   fastify.addHook("onRequest", (request) => request.jwtVerify())
 

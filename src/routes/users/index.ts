@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify"
 import { StatusCodes } from "http-status-codes"
 
-export default async (fastify: FastifyInstance, _: any, done: any) => {
+export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
   fastify.addHook("onRequest", (request) => request.jwtVerify())
 

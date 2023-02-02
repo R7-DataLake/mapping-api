@@ -16,7 +16,7 @@ import deleteSchema from '../../schema/drug/delete'
 import updateSchema from '../../schema/drug/update'
 
 
-export default async (fastify: FastifyInstance, _: any, done: any) => {
+export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
   const db = fastify.db
   const drugModel = new DrugModel()
