@@ -1,43 +1,30 @@
-FROM node:18-alpine AS build
+FROM node:18-alpine AS builder
 
 LABEL maintainer="Satit Rianpit <rianpit@gmail.com>"
 
 WORKDIR /app
 
-RUN apk update && \
-  apk upgrade && \
-  apk add --no-cache \
-  python3 \
-  tzdata \
-  build-base \
-  libtool \
-  autoconf \
-  automake \
-  g++ gcc \
-  make && \
-  cp /usr/share/zoneinfo/Asia/Bangkok /etc/localtime && \
-  echo "Asia/Bangkok" > /etc/timezone
-
-RUN wget -qO /bin/pnpm "https://github.com/pnpm/pnpm/releases/latest/download/pnpm-linuxstatic-x64" && chmod +x /bin/pnpm
+RUN apk add --no-cache python3 g++
 
 COPY . .
 
-RUN pnpm i && pnpm run build
+RUN npm i && npm run build
 
-RUN apk del make gcc g++ python3
+RUN rm -f Dockerfile nodemon.json pnpm-lock.yaml run.sh tsconfig.json gulpfile.js
 
-RUN rm -rf node_modules/gulp && \
-    rm -rf node_modules/gulp-clean && \
-    rm -rf node_modules/gulp-cli && \
-    rm -rf node_modules/gulp-typescript && \
-    rm -rf node_modules/gulp-uglify && \
-    rm -rf node_modules/nodemon
+RUN rm -rf src @types demo scripts node_modules && \
+  npm i --omit=dev && \
+  npm rebuild bcrypt
 
-FROM keymetrics/pm2:18-slim
+FROM node:18-alpine
 
-ENV NODE_ENV === 'production'
+COPY --from=builder /app /app
 
-COPY --from=build /app /app
+WORKDIR /app
+
+RUN apk add --no-cache g++
+
+RUN npm i -g pm2
 
 EXPOSE 3000
 

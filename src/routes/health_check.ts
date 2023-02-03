@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify"
 import { StatusCodes } from "http-status-codes"
 
-export default async (fastify: FastifyInstance, _: any, done: any) => {
+export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
   fastify.get('/health-check', {
     config: {
@@ -10,10 +10,11 @@ export default async (fastify: FastifyInstance, _: any, done: any) => {
         timeWindow: '1 minute'
       }
     }
-  }, async (_request: FastifyRequest, reply: FastifyReply) => {
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       reply.status(StatusCodes.OK).send()
-    } catch (e) {
+    } catch (error: any) {
+      request.log.error(error)
       reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
     }
   })
