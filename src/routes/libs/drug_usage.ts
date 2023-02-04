@@ -89,7 +89,7 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       await drugUsageModel.bulkInsert(db, results)
 
       reply.status(StatusCodes.OK)
-        .send(getReasonPhrase(StatusCodes.OK))
+        .send({ status: 'success' })
 
     } catch (error: any) {
       request.log.error(error)
