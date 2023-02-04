@@ -15,6 +15,7 @@ import mappingSchema from '../../schema/drug/mapping'
 import deleteSchema from '../../schema/drug/delete'
 import updateSchema from '../../schema/drug/update'
 import listSchema from '../../schema/drug/list'
+import addSchema from '../../schema/drug/add'
 
 
 export default async (fastify: FastifyInstance, _options: any, done: any) => {
@@ -137,7 +138,8 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       const params: any = request.params
       const { code } = params
       await drugModel.remove(db, code, hospcode)
-      reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
+      reply.status(StatusCodes.OK)
+        .send({ status: 'success' })
     } catch (error: any) {
       request.log.error(error)
       reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
@@ -168,7 +170,38 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       }
 
       await drugModel.mapping(db, data)
-      reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
+      reply.status(StatusCodes.OK)
+        .send({ status: 'success' })
+    } catch (error: any) {
+      request.log.error(error)
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+    }
+  })
+
+  // Save new drug
+  fastify.post('/new', {
+    schema: addSchema,
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const hospcode = request.user.hospcode
+      const userId = request.user.sub
+
+      const body: any = request.body
+      const { code, name } = body
+
+      const now = DateTime.now().setZone('Asia/Bangkok');
+
+      const data: IDrugInsert = {
+        code,
+        name,
+        user_id: userId,
+        hospcode,
+        updated_at: now
+      }
+
+      await drugModel.save(db, data)
+      reply.status(StatusCodes.OK)
+        .send({ status: 'success' })
     } catch (error: any) {
       request.log.error(error)
       reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
@@ -198,7 +231,8 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       }
 
       await drugModel.update(db, hospcode, code, data)
-      reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
+      reply.status(StatusCodes.OK)
+        .send({ status: 'success' })
     } catch (error: any) {
       request.log.error(error)
       reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
