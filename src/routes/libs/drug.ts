@@ -179,7 +179,7 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
   })
 
   // Save new drug
-  fastify.post('/add', {
+  fastify.post('/new', {
     schema: addSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
