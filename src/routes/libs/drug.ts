@@ -137,7 +137,8 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       const params: any = request.params
       const { code } = params
       await drugModel.remove(db, code, hospcode)
-      reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
+      reply.status(StatusCodes.OK)
+        .send({ status: 'success' })
     } catch (error: any) {
       request.log.error(error)
       reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
@@ -168,7 +169,8 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       }
 
       await drugModel.mapping(db, data)
-      reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
+      reply.status(StatusCodes.OK)
+        .send({ status: 'success' })
     } catch (error: any) {
       request.log.error(error)
       reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
@@ -198,7 +200,8 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       }
 
       await drugModel.update(db, hospcode, code, data)
-      reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
+      reply.status(StatusCodes.OK)
+        .send({ status: 'success' })
     } catch (error: any) {
       request.log.error(error)
       reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
