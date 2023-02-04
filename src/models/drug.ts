@@ -6,37 +6,38 @@ export class DrugModel {
 
   list(db: Knex, hospcode: any, query: any, limit: any, offset: any) {
 
-    let sql = db('drugs')
-      .select('code', 'name', 'created_at', 'updated_at')
-
+    let sql = db('drugs as d')
+      .select('d.code', 'd.name', 'd.created_at', 'd.updated_at', 'm.f43', 'm.tmt')
+      .joinRaw('left join drug_mappings as m on m.code=d.code and m.hospcode=d.hospcode')
     if (query) {
       let _query = `%${query}%`
       sql.where(builder => {
-        builder.where('name', 'like', _query)
-          .orWhere('code', 'like', _query)
+        builder.whereRaw('LOWER(d.name) like LOWER(?)', [_query])
+          .orWhere('d.code', 'like', _query)
       })
     }
 
     return sql
-      .where({ hospcode })
+      .whereRaw('d.hospcode=?', [hospcode])
       .limit(limit).offset(offset)
 
   }
 
   listTotal(db: Knex, hospcode: any, query: any) {
 
-    let sql = db('drugs')
+    let sql = db('drugs as d')
+      .joinRaw('left join drug_mappings as m on m.code=d.code and m.hospcode=d.hospcode')
 
     if (query) {
       let _query = `%${query}%`
       sql.where(builder => {
-        builder.where('name', 'like', _query)
-          .orWhere('code', 'like', _query)
+        builder.whereRaw('LOWER(d.name) like LOWER(?)', [_query])
+          .orWhere('d.code', 'like', _query)
       })
     }
 
     return sql
-      .where({ hospcode })
+      .whereRaw('d.hospcode=?', [hospcode])
       .count({ total: '*' })
 
   }

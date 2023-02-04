@@ -13,6 +13,7 @@ const { DateTime } = require('luxon')
 import mappingSchema from '../../schema/lab/mapping'
 import deleteSchema from '../../schema/lab/delete'
 import updateSchema from '../../schema/lab/update'
+import listSchema from '../../schema/lab/list'
 
 import { ILabInsert, ILabMapping, ILabUpdate } from '../../../@types/lab'
 
@@ -22,7 +23,9 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
   const db = fastify.db
   const labModel = new LabModel()
 
-  fastify.get('/list', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/list', {
+    schema: listSchema
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const _query: any = request.query
       const { limit, offset, query } = _query
@@ -112,7 +115,7 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       await labModel.bulkInsert(db, results)
 
       reply.status(StatusCodes.OK)
-        .send(getReasonPhrase(StatusCodes.OK))
+        .send({ status: 'success' })
 
     } catch (error: any) {
       request.log.error(error)
