@@ -14,6 +14,7 @@ import mappingSchema from '../../schema/lab/mapping'
 import deleteSchema from '../../schema/lab/delete'
 import updateSchema from '../../schema/lab/update'
 import listSchema from '../../schema/lab/list'
+import addSchema from '../../schema/lab/add'
 
 import { ILabInsert, ILabMapping, ILabUpdate } from '../../../@types/lab'
 
@@ -44,7 +45,14 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       })
     } catch (error: any) {
       request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send({
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
+        })
     }
   })
 
@@ -119,11 +127,13 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
     } catch (error: any) {
       request.log.error(error)
-      reply
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
         .send({
-          code: StatusCodes.INTERNAL_SERVER_ERROR,
-          error: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
         })
     }
   })
@@ -139,10 +149,18 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       const params: any = request.params
       const { code } = params
       await labModel.remove(db, code, hospcode)
-      reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
+      reply.status(StatusCodes.OK)
+        .send({ status: 'success' })
     } catch (error: any) {
       request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send({
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
+        })
     }
   })
 
@@ -155,14 +173,13 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       const userId = request.user.sub
 
       const body: any = request.body
-      const { code, f43, nhso, loinc } = body
+      const { code, f43, loinc } = body
 
       const now = DateTime.now().setZone('Asia/Bangkok');
 
       const data: ILabMapping = {
         code,
         f43,
-        nhso,
         loinc,
         user_id: userId,
         hospcode,
@@ -170,10 +187,18 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       }
 
       await labModel.mapping(db, data)
-      reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
+      reply.status(StatusCodes.OK)
+        .send({ status: 'success' })
     } catch (error: any) {
       request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send({
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
+        })
     }
   })
 
@@ -201,12 +226,59 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       }
 
       await labModel.update(db, hospcode, code, data)
-      reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
+      reply.status(StatusCodes.OK)
+        .send({ status: 'success' })
     } catch (error: any) {
       request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send({
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
+        })
     }
   })
+
+  // Save new drug
+  fastify.post('/new', {
+    schema: addSchema,
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const hospcode = request.user.hospcode
+      const userId = request.user.sub
+
+      const body: any = request.body
+      const { code, name, lab_group_code } = body
+
+      const now = DateTime.now().setZone('Asia/Bangkok');
+
+      const data: ILabInsert = {
+        code,
+        name,
+        lab_group_code,
+        user_id: userId,
+        hospcode,
+        updated_at: now
+      }
+
+      await labModel.save(db, data)
+      reply.status(StatusCodes.OK)
+        .send({ status: 'success' })
+    } catch (error: any) {
+      request.log.error(error)
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send({
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
+        })
+    }
+  })
+
 
   done()
 

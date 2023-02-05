@@ -6,19 +6,20 @@ export class LabModel {
 
   list(db: Knex, hospcode: any, query: any, limit: any, offset: any) {
 
-    let sql = db('labs')
-      .select('code', 'name', 'lab_group_code', 'created_at', 'updated_at')
+    let sql = db('labs as l')
+      .select('l.code', 'l.name', 'l.lab_group_code', 'l.created_at', 'l.updated_at', 'm.f43', 'm.loinc')
+      .joinRaw('left join lab_mappings as m on m.code=l.code and m.hospcode=l.hospcode')
 
     if (query) {
       let _query = `%${query}%`
       sql.where(builder => {
-        builder.where('name', 'like', _query)
-          .orWhere('code', 'like', _query)
+        builder.whereRaw('LOWER(l.name) like LOWER(?)', [_query])
+          .orWhere('l.code', 'like', _query)
       })
     }
 
     return sql
-      .where({ hospcode })
+      .whereRaw('l.hospcode=?', [hospcode])
       .limit(limit).offset(offset)
 
   }
@@ -30,7 +31,7 @@ export class LabModel {
     if (query) {
       let _query = `%${query}%`
       sql.where(builder => {
-        builder.where('name', 'like', _query)
+        builder.whereRaw('LOWER(name) like LOWER(?)', [_query])
           .orWhere('code', 'like', _query)
       })
     }
@@ -51,8 +52,6 @@ export class LabModel {
   save(db: Knex, data: ILabInsert) {
     return db('labs')
       .insert(data)
-      .onConflict(['code', 'hospcode'])
-      .merge(['name', 'lab_group_code', 'user_id', 'updated_at'])
   }
 
   update(db: Knex, hospcode: any, code: any, data: ILabUpdate) {
@@ -71,7 +70,7 @@ export class LabModel {
     return db('lab_mappings')
       .insert(data)
       .onConflict(['code', 'hospcode'])
-      .merge(['f43', 'loinc', 'nhso', 'updated_at'])
+      .merge(['f43', 'loinc', 'updated_at'])
   }
 
 }

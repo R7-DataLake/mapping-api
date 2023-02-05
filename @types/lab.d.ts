@@ -2,7 +2,6 @@ export interface ILabMapping {
   code: string
   hospcode: string
   f43: string
-  nhso: string
   loinc: string
   user_id: string
   updated_at: string
