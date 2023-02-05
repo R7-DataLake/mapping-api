@@ -4,7 +4,6 @@ specifiers:
   '@fastify/autoload': ^5.7.1
   '@fastify/cors': ^8.2.0
   '@fastify/formbody': ^7.4.0
-  '@fastify/helmet': ^10.1.0
   '@fastify/jwt': ^6.5.0
   '@fastify/multipart': ^7.4.0
   '@fastify/rate-limit': ^7.6.0
@@ -36,7 +35,6 @@ dependencies:
   '@fastify/autoload': 5.7.1
   '@fastify/cors': 8.2.0
   '@fastify/formbody': 7.4.0
-  '@fastify/helmet': 10.1.0
   '@fastify/jwt': 6.5.0
   '@fastify/multipart': 7.4.0
   '@fastify/rate-limit': 7.6.0
@@ -317,13 +315,6 @@ packages:
     dependencies:
       fast-querystring: 1.1.0
       fastify-plugin: 4.5.0
-    dev: false
-
-  /@fastify/helmet/10.1.0:
-    resolution: {integrity: sha512-v7QJPYf1uVcCwzyHzkDGcHTqDPscXj/61JKxOdvczyDPAKTxSeb9Sc2OBActXaj7zUELiAdgnkKkzNwmCNzBLQ==}
-    dependencies:
-      fastify-plugin: 4.5.0
-      helmet: 6.0.1
     dev: false
 
   /@fastify/jwt/6.5.0:
@@ -2189,11 +2180,6 @@ packages:
     dependencies:
       is-stream: 2.0.1
       type-fest: 0.8.1
-    dev: false
-
-  /helmet/6.0.1:
-    resolution: {integrity: sha512-8wo+VdQhTMVBMCITYZaGTbE4lvlthelPYSvoyNvk4RECTmrVjMerp9RfUOQXZWLvCcAn1pKj7ZRxK4lI9Alrcw==}
-    engines: {node: '>=14.0.0'}
     dev: false
 
   /help-me/4.2.0:
