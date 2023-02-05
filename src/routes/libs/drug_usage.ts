@@ -13,12 +13,39 @@ const { DateTime } = require('luxon')
 
 import deleteSchema from '../../schema/drug_usage/delete'
 import updateSchema from '../../schema/drug_usage/update'
+import listSchema from '../../schema/drug_usage/list'
+import addSchema from '../../schema/drug_usage/add'
 
 
 export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
   const db = fastify.db
   const drugUsageModel = new DrugUsageModel()
+
+  fastify.get('/list', {
+    schema: listSchema
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const _query: any = request.query
+      const { limit, offset, query } = _query
+      const _limit = limit || 20
+      const _offset = offset || 0
+
+      const hospcode = request.user.hospcode
+
+      const results: any = await drugUsageModel.list(db, hospcode, query, _limit, _offset)
+
+      const rsTotal: any = await drugUsageModel.listTotal(db, hospcode, query)
+
+      reply.status(StatusCodes.OK).send({
+        results,
+        'total': Number(rsTotal[0].total)
+      })
+    } catch (error: any) {
+      request.log.error(error)
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+    }
+  })
 
   fastify.post('/upload', {
     config: {
@@ -146,6 +173,38 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
       await drugUsageModel.update(db, hospcode, code, data)
       reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
+    } catch (error: any) {
+      request.log.error(error)
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+    }
+  })
+
+  // Save new drug
+  fastify.post('/new', {
+    schema: addSchema,
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const hospcode = request.user.hospcode
+      const userId = request.user.sub
+
+      const body: any = request.body
+      const { code, usage1, usage2, usage3 } = body
+
+      const now = DateTime.now().setZone('Asia/Bangkok');
+
+      const data: IDrugUsageInsert = {
+        code,
+        usage1,
+        usage2,
+        usage3,
+        user_id: userId,
+        hospcode,
+        updated_at: now
+      }
+
+      await drugUsageModel.save(db, data)
+      reply.status(StatusCodes.OK)
+        .send({ status: 'success' })
     } catch (error: any) {
       request.log.error(error)
       reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
