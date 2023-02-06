@@ -7,8 +7,9 @@ export class LabModel {
   list(db: Knex, hospcode: any, query: any, limit: any, offset: any) {
 
     let sql = db('labs as l')
-      .select('l.code', 'l.name', 'l.lab_group_code', 'l.created_at', 'l.updated_at', 'm.f43', 'm.loinc')
+      .select('l.code', 'l.name', 'l.lab_group_code', 'g.name as lab_group_name', 'l.created_at', 'l.updated_at', 'm.f43', 'm.loinc')
       .joinRaw('left join lab_mappings as m on m.code=l.code and m.hospcode=l.hospcode')
+      .joinRaw('left join lab_groups as g on g.hospcode=l.hospcode and g.code=l.lab_group_code')
 
     if (query) {
       let _query = `%${query}%`
