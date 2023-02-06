@@ -54,8 +54,6 @@ export class DrugUsageModel {
   save(db: Knex, data: IDrugUsageInsert) {
     return db('drug_usages')
       .insert(data)
-      .onConflict(['code', 'hospcode'])
-      .merge(['usage1', 'usage2', 'usage3', 'user_id', 'updated_at'])
   }
 
   update(db: Knex, hospcode: any, code: any, data: IDrugUsageUpdate) {

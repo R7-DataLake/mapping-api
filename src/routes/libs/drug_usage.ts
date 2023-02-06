@@ -33,17 +33,25 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
       const hospcode = request.user.hospcode
 
-      const results: any = await drugUsageModel.list(db, hospcode, query, _limit, _offset)
+      const data: any = await drugUsageModel.list(db, hospcode, query, _limit, _offset)
 
       const rsTotal: any = await drugUsageModel.listTotal(db, hospcode, query)
 
       reply.status(StatusCodes.OK).send({
-        results,
-        'total': Number(rsTotal[0].total)
+        status: 'success',
+        data,
+        total: Number(rsTotal[0].total)
       })
     } catch (error: any) {
       request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send({
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
+        })
     }
   })
 
@@ -120,11 +128,13 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
     } catch (error: any) {
       request.log.error(error)
-      reply
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
         .send({
-          code: StatusCodes.INTERNAL_SERVER_ERROR,
-          error: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
         })
     }
   })
@@ -143,7 +153,14 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
     } catch (error: any) {
       request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send({
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
+        })
     }
   })
 
@@ -175,11 +192,18 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       reply.status(StatusCodes.OK).send(getReasonPhrase(StatusCodes.OK))
     } catch (error: any) {
       request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send({
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
+        })
     }
   })
 
-  // Save new drug
+  // Save new
   fastify.post('/new', {
     schema: addSchema,
   }, async (request: FastifyRequest, reply: FastifyReply) => {
@@ -206,8 +230,14 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       reply.status(StatusCodes.OK)
         .send({ status: 'success' })
     } catch (error: any) {
-      request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send({
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
+        })
     }
   })
 

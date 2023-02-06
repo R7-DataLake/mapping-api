@@ -1,15 +1,13 @@
 import { Knex } from 'knex'
-import { ILabInsert, ILabMapping, ILabUpdate } from '../../@types/lab'
-export class LabModel {
+import { ILabGroupInsert, ILabGroupUpdate } from '../../@types/lab_group'
+export class LabGroupModel {
 
   constructor () { }
 
   list(db: Knex, hospcode: any, query: any, limit: any, offset: any) {
 
-    let sql = db('labs as l')
-      .select('l.code', 'l.name', 'l.lab_group_code', 'g.name as lab_group_name', 'l.created_at', 'l.updated_at', 'm.f43', 'm.loinc')
-      .joinRaw('left join lab_mappings as m on m.code=l.code and m.hospcode=l.hospcode')
-      .joinRaw('left join lab_groups as g on g.hospcode=l.hospcode and g.code=l.lab_group_code')
+    let sql = db('lab_groups as l')
+      .select('l.code', 'l.name', 'l.created_at', 'l.updated_at')
 
     if (query) {
       let _query = `%${query}%`
@@ -27,7 +25,7 @@ export class LabModel {
 
   listTotal(db: Knex, hospcode: any, query: any) {
 
-    let sql = db('labs')
+    let sql = db('lab_groups')
 
     if (query) {
       let _query = `%${query}%`
@@ -43,35 +41,28 @@ export class LabModel {
 
   }
 
-  bulkInsert(db: Knex, data: ILabInsert[]) {
-    return db('labs')
+  bulkInsert(db: Knex, data: ILabGroupInsert[]) {
+    return db('lab_groups')
       .insert(data)
       .onConflict(['code', 'hospcode'])
-      .merge(['name', 'lab_group_code', 'user_id', 'updated_at'])
+      .merge(['name', 'user_id', 'updated_at'])
   }
 
-  save(db: Knex, data: ILabInsert) {
-    return db('labs')
+  save(db: Knex, data: ILabGroupInsert) {
+    return db('lab_groups')
       .insert(data)
   }
 
-  update(db: Knex, hospcode: any, code: any, data: ILabUpdate) {
-    return db('labs')
+  update(db: Knex, hospcode: any, code: any, data: ILabGroupUpdate) {
+    return db('lab_groups')
       .update(data)
       .where({ code, hospcode })
   }
 
   remove(db: Knex, code: any, hospcode: any) {
-    return db('labs')
+    return db('lab_groups')
       .where({ code, hospcode })
       .del()
-  }
-
-  mapping(db: Knex, data: ILabMapping) {
-    return db('lab_mappings')
-      .insert(data)
-      .onConflict(['code', 'hospcode'])
-      .merge(['f43', 'loinc', 'updated_at'])
   }
 
 }

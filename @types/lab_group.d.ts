@@ -1,24 +1,21 @@
-export interface ILabMapping {
-  code: string
-  hospcode: string
-  f43: string
-  loinc: string
-  user_id: string
-  updated_at: string
-}
-
-export interface ILabInsert {
+export interface ILabGroup {
   code: string
   hospcode: string
   name: string
-  lab_group_code: string
   user_id: string
+  created_at: string
   updated_at: string
 }
 
-export interface ILabUpdate {
+export interface ILabGroupInsert {
+  code: string
+  hospcode: string
   name: string
-  lab_group_code: string
+  user_id: string
+}
+
+export interface ILabGroupUpdate {
+  name: string
   user_id: string
   updated_at: string
 }

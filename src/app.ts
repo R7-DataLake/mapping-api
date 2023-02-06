@@ -2,7 +2,6 @@ import fastify from 'fastify'
 import path from 'path'
 
 const autoload = require('@fastify/autoload')
-const helmet = require('@fastify/helmet')
 
 const app = fastify({
   logger: {
@@ -31,11 +30,6 @@ app.register(import('@fastify/rate-limit'), {
   max: 20,
   timeWindow: '1 minute'
 })
-
-app.register(
-  helmet,
-  { contentSecurityPolicy: false }
-)
 
 // Web services
 app.register(require('fastify-axios'), {

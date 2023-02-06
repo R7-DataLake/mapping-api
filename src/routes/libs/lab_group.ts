@@ -3,25 +3,25 @@ import {
   StatusCodes,
   getReasonPhrase,
 } from 'http-status-codes'
-import { IDrugInsert, IDrugMapping, IDrugUpdate } from "../../../@types/drug"
-import { DrugModel } from "../../models/drug"
 
 const fs = require('fs')
 const csv = require('csv-parser')
 
 const { DateTime } = require('luxon')
 
-import mappingSchema from '../../schema/drug/mapping'
-import deleteSchema from '../../schema/drug/delete'
-import updateSchema from '../../schema/drug/update'
-import listSchema from '../../schema/drug/list'
-import addSchema from '../../schema/drug/add'
+import deleteSchema from '../../schema/lab_groups/delete'
+import updateSchema from '../../schema/lab_groups/update'
+import listSchema from '../../schema/lab_groups/list'
+import addSchema from '../../schema/lab_groups/add'
+import { LabGroupModel } from '../../models/lab_group'
+
+import { ILabGroup, ILabGroupInsert, ILabGroupUpdate } from '../../../@types/lab_group'
 
 
 export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
   const db = fastify.db
-  const drugModel = new DrugModel()
+  const labGroupModel = new LabGroupModel()
 
   fastify.get('/list', {
     schema: listSchema
@@ -34,9 +34,9 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
       const hospcode = request.user.hospcode
 
-      const data: any = await drugModel.list(db, hospcode, query, _limit, _offset)
+      const data: ILabGroup[] = await labGroupModel.list(db, hospcode, query, _limit, _offset)
 
-      const rsTotal: any = await drugModel.listTotal(db, hospcode, query)
+      const rsTotal: any = await labGroupModel.listTotal(db, hospcode, query)
 
       reply.status(StatusCodes.OK).send({
         status: 'success',
@@ -45,7 +45,14 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       })
     } catch (error: any) {
       request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send({
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
+        })
     }
   })
 
@@ -78,7 +85,7 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       }
 
       const filepath = files[0].filepath
-      let results: IDrugInsert[] = []
+      let results: ILabGroupInsert[] = [];
 
       const stream = fs.createReadStream(filepath)
         .pipe(csv())
@@ -88,16 +95,18 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
       for await (const data of stream) {
         if (!headerChecked) {
-          const header = Object.keys(data)
+          const header = Object.keys(data);
           if (!expectedHeader.every((h) => header.includes(h))) {
             const errorMessage = `ERROR: The header of the CSV file is invalid. Expected: ${expectedHeader.join(', ')}. Found: ${header.join(', ')}.`
             console.error(errorMessage)
 
-            return reply
-              .status(StatusCodes.INTERNAL_SERVER_ERROR)
+            reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
               .send({
-                code: StatusCodes.INTERNAL_SERVER_ERROR,
-                error: errorMessage
+                status: 'error',
+                error: {
+                  code: StatusCodes.INTERNAL_SERVER_ERROR,
+                  message: errorMessage
+                }
               })
           }
           headerChecked = true
@@ -107,23 +116,24 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
           name: data.name,
           code: data.code,
           user_id: userId,
-          updated_at: now,
         })
       }
 
       // Import
-      await drugModel.bulkInsert(db, results)
+      await labGroupModel.bulkInsert(db, results)
 
       reply.status(StatusCodes.OK)
         .send({ status: 'success' })
 
     } catch (error: any) {
       request.log.error(error)
-      reply
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
         .send({
-          code: StatusCodes.INTERNAL_SERVER_ERROR,
-          error: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
         })
     }
   })
@@ -138,74 +148,19 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
       const params: any = request.params
       const { code } = params
-      await drugModel.remove(db, code, hospcode)
+      await labGroupModel.remove(db, code, hospcode)
       reply.status(StatusCodes.OK)
         .send({ status: 'success' })
     } catch (error: any) {
       request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
-    }
-  })
-
-  // Save mapping
-  fastify.post('/mapping', {
-    schema: mappingSchema,
-  }, async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const hospcode = request.user.hospcode
-      const userId = request.user.sub
-
-      const body: any = request.body
-      const { code, f43, nhso, tmt } = body
-
-      const now = DateTime.now().setZone('Asia/Bangkok');
-
-      const data: IDrugMapping = {
-        code,
-        f43,
-        nhso,
-        tmt,
-        user_id: userId,
-        hospcode,
-        updated_at: now
-      }
-
-      await drugModel.mapping(db, data)
-      reply.status(StatusCodes.OK)
-        .send({ status: 'success' })
-    } catch (error: any) {
-      request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
-    }
-  })
-
-  // Save new drug
-  fastify.post('/new', {
-    schema: addSchema,
-  }, async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const hospcode = request.user.hospcode
-      const userId = request.user.sub
-
-      const body: any = request.body
-      const { code, name } = body
-
-      const now = DateTime.now().setZone('Asia/Bangkok');
-
-      const data: IDrugInsert = {
-        code,
-        name,
-        user_id: userId,
-        hospcode,
-        updated_at: now
-      }
-
-      await drugModel.save(db, data)
-      reply.status(StatusCodes.OK)
-        .send({ status: 'success' })
-    } catch (error: any) {
-      request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send({
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
+        })
     }
   })
 
@@ -225,20 +180,62 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
       const now = DateTime.now().setZone('Asia/Bangkok');
 
-      const data: IDrugUpdate = {
+      const data: ILabGroupUpdate = {
         name,
         user_id: userId,
-        updated_at: now
+        updated_at: now,
       }
 
-      await drugModel.update(db, hospcode, code, data)
+      await labGroupModel.update(db, hospcode, code, data)
       reply.status(StatusCodes.OK)
         .send({ status: 'success' })
     } catch (error: any) {
       request.log.error(error)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send({
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
+        })
     }
   })
+
+  // Save new drug
+  fastify.post('/new', {
+    schema: addSchema,
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const hospcode = request.user.hospcode
+      const userId = request.user.sub
+
+      const body: any = request.body
+      const { code, name } = body
+
+      const data: ILabGroupInsert = {
+        code,
+        name,
+        user_id: userId,
+        hospcode
+      }
+
+      await labGroupModel.save(db, data)
+      reply.status(StatusCodes.OK)
+        .send({ status: 'success' })
+    } catch (error: any) {
+      request.log.error(error)
+      reply.status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .send({
+          status: 'error',
+          error: {
+            code: StatusCodes.INTERNAL_SERVER_ERROR,
+            message: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
+          }
+        })
+    }
+  })
+
 
   done()
 
