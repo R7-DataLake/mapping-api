@@ -6,12 +6,12 @@ export class ProviderModel {
   list(db: Knex, hospcode: any, query: any, limit: any, offset: any) {
 
     let sql = db('providers as p')
-      .select('p.code', 'p.prename', 'p.fname', 'p.lname', 'p.sex', 'p.start_date', 'p.end_date', 'p.register_no', 'p.council', 'p.provider_type', 'p.birth', 'p.created_at', 'p.updated_at', 'm.f43', 'm.nhso')
+      .select('p.code', 'p.cid', 'p.prename', 'p.fname', 'p.lname', 'p.sex', 'p.start_date', 'p.end_date', 'p.register_no', 'p.council', 'p.provider_type', 'p.birth', 'p.created_at', 'p.updated_at', 'm.f43', 'm.nhso')
       .joinRaw('left join provider_mappings as m on m.code=p.code and m.hospcode=p.hospcode')
     if (query) {
       let _query = `%${query}%`
       sql.where(builder => {
-        builder.whereRaw('LOWER(p.name) like LOWER(?)', [_query])
+        builder.whereRaw('LOWER(p.fname) like LOWER(?)', [_query])
           .orWhere('p.code', 'like', _query)
       })
     }
@@ -30,7 +30,7 @@ export class ProviderModel {
     if (query) {
       let _query = `%${query}%`
       sql.where(builder => {
-        builder.whereRaw('LOWER(p.name) like LOWER(?)', [_query])
+        builder.whereRaw('LOWER(p.fname) like LOWER(?)', [_query])
           .orWhere('p.code', 'like', _query)
       })
     }

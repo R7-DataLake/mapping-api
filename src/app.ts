@@ -75,7 +75,7 @@ app.register(require('./plugins/db_rawdata'), {
     searchPath: [process.env.R7PLATFORM_PORTAL_API_DB_RAW_SCHEMA || 'public'],
     pool: {
       min: Number(process.env.R7PLATFORM_PORTAL_API_DB_RAW_POOL_MIN) || 0,
-      max: Number(process.env.R7PLATFORM_PORTAL_API_DB_RAW_POOL_MAX) || 500
+      max: Number(process.env.R7PLATFORM_PORTAL_API_DB_RAW_POOL_MAX) || 50
     },
     debug: process.env.R7PLATFORM_PORTAL_API_DB_RAW_DEBUG === "Y" ? true : false,
   }
