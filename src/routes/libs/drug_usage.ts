@@ -87,7 +87,7 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       let results: IDrugUsageInsert[] = []
 
       const stream = fs.createReadStream(filepath)
-        .pipe(csv())
+        .pipe(csv({ separator: '|' }))
 
       const expectedHeader = ['code', 'usage1', 'usage2', 'usage3']
       let headerChecked = false
