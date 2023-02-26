@@ -77,7 +77,7 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       let results: IProviderInsert[] = []
 
       const stream = fs.createReadStream(filepath)
-        .pipe(csv())
+        .pipe(csv({ separator: '|' }))
 
       const expectedHeader = ['code', 'cid', 'prename', 'fname', 'lname', 'sex', 'birth', 'provider_type', 'start_date', 'end_date', 'register_no', 'council']
       let headerChecked = false
