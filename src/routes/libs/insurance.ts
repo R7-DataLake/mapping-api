@@ -77,7 +77,10 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       let results: IInsuranceInsert[] = []
 
       const stream = fs.createReadStream(filepath)
-        .pipe(csv({ separator: '|' }))
+        .pipe(csv({
+          separator: '|',
+          mapHeaders: ({ header, index }: { header: any, index: number }) => header.toLowerCase()
+        }))
 
       const expectedHeader = ['code', 'name']
       let headerChecked = false
