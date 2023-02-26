@@ -10,6 +10,7 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
   fastify.register(require('./lab_group'), { prefix: '/lab-groups' })
   fastify.register(require('./insurance'), { prefix: '/insurances' })
   fastify.register(require('./occupation'), { prefix: '/occupations' })
+  fastify.register(require('./nation'), { prefix: '/nations' })
 
   done()
 
