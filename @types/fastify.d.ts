@@ -7,6 +7,7 @@ declare module 'fastify' {
     jwt: jsonwebtoken
     authenticate: any
     db: Knex
+    dbraw: Knex
     axios: AxiosInstance | any
   }
 
