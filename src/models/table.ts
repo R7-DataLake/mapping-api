@@ -38,15 +38,11 @@ export class TableModel {
 
   }
 
-  opd(db: Knex, hospcode: any, query: any, limit: any, offset: any) {
+  opd(db: Knex, hospcode: any, date_serv: any, limit: any, offset: any) {
     let sql = db('opd')
       .select()
-    if (query) {
-      let _query = `%${query}%`
-      sql.where(builder => {
-        builder.whereRaw('LOWER(fname) like LOWER(?)', [_query])
-          .orWhere('cid', 'like', _query)
-      })
+    if (date_serv) {
+      sql.where('date_serv', date_serv)
     }
 
     return sql
@@ -56,16 +52,40 @@ export class TableModel {
 
   }
 
-  opdTotal(db: Knex, hospcode: any, query: any) {
+  opdTotal(db: Knex, hospcode: any, date_serv: any) {
 
     let sql = db('opd')
 
-    if (query) {
-      let _query = `%${query}%`
-      sql.where(builder => {
-        builder.whereRaw('LOWER(hn) like LOWER(?)', [_query])
-          .orWhere('vn', 'like', _query)
-      })
+    if (date_serv) {
+      sql.where('date_serv', date_serv)
+    }
+
+    return sql
+      .whereRaw('hospcode=?', [hospcode])
+      .count({ total: '*' })
+
+  }
+
+  ipd(db: Knex, hospcode: any, datedsc: any, limit: any, offset: any) {
+    let sql = db('ipd')
+      .select()
+    if (datedsc) {
+      sql.where('datedsc', datedsc)
+    }
+
+    return sql
+      .whereRaw('hospcode=?', [hospcode])
+      .orderByRaw('datedsc desc, timedsc desc')
+      .limit(limit).offset(offset)
+
+  }
+
+  ipdTotal(db: Knex, hospcode: any, datedsc: any) {
+
+    let sql = db('ipd')
+
+    if (datedsc) {
+      sql.where('datedsc', datedsc)
     }
 
     return sql
