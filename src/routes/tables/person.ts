@@ -2,10 +2,9 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 import {
   StatusCodes,
 } from 'http-status-codes'
-import { DrugModel } from "../../models/drug"
 import { TableModel } from '../../models/table'
 
-const { DateTime } = require('luxon')
+import { DateTime } from 'luxon'
 
 import listSchema from '../../schema/search'
 
@@ -28,8 +27,8 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       const _data: any = await tableModel.person(db, hospcode, query, _limit, _offset)
 
       const data: any = _data.map((v: any) => {
-        v.birth = DateTime.fromSQL(v.birth, { locale: 'th' }).toLocaleString(DateTime.DATE_MED);
-        v.d_update = DateTime.fromSQL(v.d_update, { locale: 'th' }).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS);
+        v.birth = DateTime.fromJSDate(v.birth).toISODate();
+        v.d_update = DateTime.fromJSDate(v.d_update).toISO();
 
         return v;
       })

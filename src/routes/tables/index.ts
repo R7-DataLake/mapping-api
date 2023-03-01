@@ -6,6 +6,7 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
   fastify.register(require('./person'), { prefix: '/person' })
   fastify.register(require('./opd'), { prefix: '/opd' })
+  fastify.register(require('./ipd'), { prefix: '/ipd' })
 
   done()
 
