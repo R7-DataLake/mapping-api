@@ -1,1 +1,1 @@
-docker build -t r7platform/login . --no-cache
+docker build -t mophos/r7platform-portal-api . --no-cache

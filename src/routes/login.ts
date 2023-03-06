@@ -1,23 +1,13 @@
+import { AxiosResponse } from "axios"
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify"
-import {
-  StatusCodes,
-  getReasonPhrase,
-} from 'http-status-codes'
+import { getReasonPhrase, StatusCodes } from "http-status-codes"
 
-const randomstring = require('randomstring')
+import { LoginService } from '../models/login'
+import _ from 'lodash'
 
-import { LoginModel } from '../models/login'
-import { TokenModel } from '../models/token'
+export default async (fastify: FastifyInstance, _options: any, done: any) => {
 
-import loginSchema from '../schema/login'
-
-
-export default async (fastify: FastifyInstance) => {
-
-  const loginModel = new LoginModel()
-  const tokenModel = new TokenModel()
-
-  const db = fastify.db
+  const loginService = new LoginService()
 
   fastify.post('/login', {
     config: {
@@ -25,62 +15,38 @@ export default async (fastify: FastifyInstance) => {
         max: 10,
         timeWindow: '1 minute'
       }
-    },
-    schema: loginSchema,
+    }
   }, async (request: FastifyRequest, reply: FastifyReply) => {
-    const body: any = request.body
-    const { username, password } = body
-
     try {
-      const hash: any = await fastify.hashPassword(password)
-      const data: any = await loginModel.login(db, username, hash)
-      if (data) {
-        const payload: any = { sub: data.id, ingress_zone: data.ingress_zone, hospcode: data.hospcode }
+      const body: any = request.body
+      const { username, password } = body
+      // Login via Login Service
+      const rs: AxiosResponse = await loginService.doLogin(fastify.axios, username, password)
+      // Response data from login service
+      const data: any = rs.data
+      // Check access_token key
+      if (_.has(data, 'access_token')) {
+        const loginToken: any = data.access_token
+        // Decode JWT
+        const decoded: any = fastify.jwt.decode(loginToken)
+        // Create data payload
+        const payload: any = {
+          sub: decoded.sub,
+          hospcode: decoded.hospcode,
+        }
+
+        // Sign new JWT token
         const access_token = fastify.jwt.sign(payload)
-        const refresh_token = randomstring.generate(64)
-
-        // save token
-        await tokenModel.saveToken(db, data, refresh_token)
-
-        reply
-          .status(StatusCodes.OK)
-          .send({ access_token, refresh_token })
+        reply.status(StatusCodes.OK).send({ access_token })
       } else {
-        reply
-          .status(StatusCodes.UNAUTHORIZED)
-          .send({
-            code: StatusCodes.UNAUTHORIZED,
-            error: getReasonPhrase(StatusCodes.UNAUTHORIZED)
-          })
+        reply.status(StatusCodes.UNAUTHORIZED)
+          .send(getReasonPhrase(StatusCodes.UNAUTHORIZED))
       }
-
     } catch (error: any) {
-      request.log.error(error)
-      reply
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .send({
-          code: StatusCodes.INTERNAL_SERVER_ERROR,
-          error: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR)
-        })
+      reply.status(StatusCodes.BAD_GATEWAY).send(error)
     }
   })
 
-  fastify.get('/genpass', {
-    config: {
-      rateLimit: {
-        max: 10,
-        timeWindow: '1 minute'
-      }
-    }
-  }, async (_request: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const password: any = randomstring.generate(8)
-      const hash: any = await fastify.hashPassword(password)
-      reply.status(StatusCodes.OK).send({ password, hash })
-    } catch (e) {
-      console.error(e)
-      reply.status(StatusCodes.INTERNAL_SERVER_ERROR).send()
-    }
-  })
+  done()
 
 } 
