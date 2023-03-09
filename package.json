@@ -1,7 +1,7 @@
 {
-  "name": "r7platform-mapping-api",
+  "name": "r7platform-userportal-api",
   "version": "1.0.0",
-  "description": "R7 Mapping API Service",
+  "description": "R7 User Portal API Service",
   "scripts": {
     "build": "npx gulp",
     "start": "npx nodemon"
