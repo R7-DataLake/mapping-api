@@ -102,9 +102,9 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
           headerChecked = true
         }
 
-        const birth = data.birth ? DateTime.fromFormat(data.birth, "yyyyMMdd").toFormat('yyyy-MM-dd') : "";
-        const start_date = data.start_date ? DateTime.fromFormat(data.start_date, "yyyyMMdd").toFormat('yyyy-MM-dd') : "";
-        const end_date = data.end_date ? DateTime.fromFormat(data.end_date, "yyyyMMdd").toFormat('yyyy-MM-dd') : "";
+        const birth = data.birth ? DateTime.fromFormat(data.birth, "yyyyMMdd").toFormat('yyyy-MM-dd') : null;
+        const start_date = data.start_date ? DateTime.fromFormat(data.start_date, "yyyyMMdd").toFormat('yyyy-MM-dd') : null;
+        const end_date = data.end_date ? DateTime.fromFormat(data.end_date, "yyyyMMdd").toFormat('yyyy-MM-dd') : null;
 
         results.push({
           hospcode,
