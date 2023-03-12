@@ -9,7 +9,8 @@ export class TableModel {
       let _query = `%${query}%`
       sql.where(builder => {
         builder.whereRaw('LOWER(fname) like LOWER(?)', [_query])
-          .orWhere('cid', 'like', _query)
+          .orWhere('cid', query)
+          .orWhere('hn', query)
       })
     }
 
@@ -28,7 +29,8 @@ export class TableModel {
       let _query = `%${query}%`
       sql.where(builder => {
         builder.whereRaw('LOWER(fname) like LOWER(?)', [_query])
-          .orWhere('cid', 'like', _query)
+          .orWhere('cid', query)
+          .orWhere('hn', query)
       })
     }
 
