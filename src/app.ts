@@ -85,7 +85,7 @@ app.register(require('./plugins/db_rawdata'), {
 app.register(require('./plugins/jwt'), {
   secret: process.env.R7PLATFORM_PORTAL_API_SECRET_KEY,
   sign: {
-    iss: 'r7platform-PORTAL.moph.go.th',
+    iss: 'r7platform-portal.moph.go.th',
     expiresIn: '1d'
   },
   messages: {

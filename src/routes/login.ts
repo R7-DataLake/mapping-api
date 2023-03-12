@@ -43,6 +43,7 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
           .send(getReasonPhrase(StatusCodes.UNAUTHORIZED))
       }
     } catch (error: any) {
+      request.log.info(error.message);
       reply.status(StatusCodes.BAD_GATEWAY).send(error)
     }
   })

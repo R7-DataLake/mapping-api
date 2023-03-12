@@ -102,9 +102,9 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
           headerChecked = true
         }
 
-        const birth = DateTime.fromFormat(data.birth, "yyyyMMdd")
-        const start_date = DateTime.fromFormat(data.start_date, "yyyyMMdd")
-        const end_date = DateTime.fromFormat(data.end_date, "yyyyMMdd")
+        const birth = data.birth ? DateTime.fromFormat(data.birth, "yyyyMMdd").toFormat('yyyy-MM-dd') : null;
+        const start_date = data.start_date ? DateTime.fromFormat(data.start_date, "yyyyMMdd").toFormat('yyyy-MM-dd') : null;
+        const end_date = data.end_date ? DateTime.fromFormat(data.end_date, "yyyyMMdd").toFormat('yyyy-MM-dd') : null;
 
         results.push({
           hospcode,
@@ -114,9 +114,9 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
           lname: data.lname,
           sex: data.sex,
           provider_type: data.provider_type,
-          birth: birth.toFormat('yyyy-MM-dd'),
-          start_date: start_date.toFormat('yyyy-MM-dd'),
-          end_date: end_date.toFormat('yyyy-MM-dd'),
+          birth: birth,
+          start_date: start_date,
+          end_date: end_date,
           cid: data.cid,
           register_no: data.register_no,
           council: data.council,
