@@ -71,6 +71,7 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
       const now = DateTime.now().setZone('Asia/Bangkok')
 
       const files = await request.saveRequestFiles({
+        tmpdir: './tmp',
         limits: {
           fileSize: 10 * 1024 * 1024 // 10mb
         }
