@@ -33,6 +33,7 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
         const payload: any = {
           sub: decoded.sub,
           hospcode: decoded.hospcode,
+          hospname: decoded.hospname,
         }
 
         // Sign new JWT token

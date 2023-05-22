@@ -71,7 +71,7 @@ export default async (fastify: FastifyInstance, _options: any, done: any) => {
         });
         const resultIpd: any = ipd.map((v: any) => {
           v.total = Number(v.total);
-          v.dateadm = DateTime.fromJSDate(v.dateadm).toFormat('yyyy-MM-dd');
+          v.datedsc = DateTime.fromJSDate(v.datedsc).toFormat('yyyy-MM-dd');
           return v;
         });
 

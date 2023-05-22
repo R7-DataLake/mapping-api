@@ -32,11 +32,11 @@ export class ReportModel {
   getLastIpd(db: Knex, hospcode: any, start: any, end: any) {
 
     let sql = db('ipd as i')
-      .select('i.dateadm', db.raw('count(1) as total'))
+      .select('i.datedsc', db.raw('count(1) as total'))
       .where('i.hospcode', hospcode)
-      .whereBetween('i.dateadm', [start, end])
-      .groupBy('i.dateadm')
-      .orderBy('i.dateadm', 'asc');
+      .whereBetween('i.datedsc', [start, end])
+      .groupBy('i.datedsc')
+      .orderBy('i.datedsc', 'asc');
 
     return sql;
 
